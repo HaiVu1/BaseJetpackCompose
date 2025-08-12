@@ -160,6 +160,7 @@ fun <T : Any> PagingListScreen(
                 }
 
                 else -> {
+                    isRefreshingError = false
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(items.itemCount) { index ->
                             items[index]?.let { itemContent(it) }
