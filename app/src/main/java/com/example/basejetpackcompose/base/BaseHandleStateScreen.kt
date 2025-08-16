@@ -14,14 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun <T> BaseHandleStateScreen(
     uiState: State<T?>,
     uiEventFlow: Flow<UiEvent>,
     onForceLogout: () -> Unit,
-    onRetry: (() -> Unit)? = null,
     title: String,
     titleAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     leftIcon: ImageVector? = null,
@@ -38,13 +36,16 @@ fun <T> BaseHandleStateScreen(
     var noInternet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        uiEventFlow.collectLatest { event ->
+        uiEventFlow.collect { event ->
             when (event) {
                 is UiEvent.ShowLoading -> {
                     showLoading = event.isShow
                 }
 
-                is UiEvent.NetworkError -> errorMessage = "Error call API!"
+                is UiEvent.NetworkError -> {
+                    errorMessage = "Error call API!"
+                }
+
                 is UiEvent.ForceLogout -> showForceLogoutDialog = true
                 is UiEvent.NoInternet -> noInternet = true
                 UiEvent.Init -> {}
@@ -71,40 +72,24 @@ fun <T> BaseHandleStateScreen(
         LoadingDialog()
     }
 
-    // Show error dialog
-    errorMessage?.let {
-        BaseDialog(title = "Lỗi",
-            description = it,
-            onDismissRequest = {
-                errorMessage = null
-            }) {
-            errorMessage = null
-        }
+    ErrorDialog(errorMessage = errorMessage, onDismissRequest = { errorMessage = null }) {
+        errorMessage = null
     }
 
     // Show no internet dialog
     if (noInternet) {
-        BaseDialog(
-            title = "Không có kết nối mạng",
-            description = "Vui lòng kiểm tra lại kết nối Internet.",
-            onDismissRequest = {
-                noInternet = false
-            },
-        ) {
+        NoInternetDialog(onDismissRequest = {
             noInternet = false
-            onRetry?.invoke()
+        }) {
+            noInternet = false
         }
     }
 
     // Show force logout dialog
     if (showForceLogoutDialog) {
-        BaseDialog(
-            title = "Phiên đăng nhập đã hết hạn",
-            textOk = "Đăng xuất",
-            onDismissRequest = {
-                showForceLogoutDialog = false
-            }
-        ) {
+        ForceLogoutDialog(onDismissRequest = {
+            showForceLogoutDialog = false
+        }) {
             showForceLogoutDialog = false
             onForceLogout()
         }

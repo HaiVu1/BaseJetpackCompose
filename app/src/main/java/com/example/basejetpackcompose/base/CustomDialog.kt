@@ -93,3 +93,45 @@ fun LoadingDialog() {
         }
     }
 }
+
+@Composable
+fun ErrorDialog(
+    errorMessage: String? = null,
+    onDismissRequest: () -> Unit,
+    onClickedOk: () -> Unit,
+) {
+    errorMessage?.let {
+        BaseDialog(
+            title = "Lỗi",
+            description = it,
+            onDismissRequest = onDismissRequest,
+            onClickedOk = onClickedOk
+        )
+    }
+}
+
+@Composable
+fun NoInternetDialog(
+    onDismissRequest: () -> Unit,
+    onClickedOk: () -> Unit,
+) {
+    BaseDialog(
+        title = "Không có kết nối mạng",
+        description = "Vui lòng kiểm tra lại kết nối Internet.",
+        onDismissRequest = onDismissRequest,
+        onClickedOk = onClickedOk
+    )
+}
+
+@Composable
+fun ForceLogoutDialog(
+    onDismissRequest: () -> Unit,
+    onClickedOk: () -> Unit,
+) {
+    BaseDialog(
+        title = "Phiên đăng nhập đã hết hạn",
+        textOk = "Đăng xuất",
+        onDismissRequest = onDismissRequest,
+        onClickedOk = onClickedOk,
+    )
+}

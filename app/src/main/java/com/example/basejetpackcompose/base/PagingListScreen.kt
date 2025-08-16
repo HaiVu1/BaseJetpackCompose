@@ -65,7 +65,6 @@ fun <T : Any> PagingListScreen(
 
     fun resetLoading() {
         isRefreshingError = false
-        showLoading = false
     }
 
     LaunchedEffect(items) {
@@ -100,35 +99,25 @@ fun <T : Any> PagingListScreen(
         LoadingDialog()
     }
 
-    errorMessage?.let {
-        BaseDialog(title = "Lỗi",
-            description = it,
-            onDismissRequest = {
-                errorMessage = null
-            }) {
+    ErrorDialog(errorMessage = errorMessage,
+        onDismissRequest = {
             errorMessage = null
-        }
+        }) {
+        errorMessage = null
     }
 
     if (noInternet) {
-        BaseDialog(
-            title = "Không có kết nối mạng",
-            description = "Vui lòng kiểm tra lại kết nối Internet.",
-            onDismissRequest = {
-                noInternet = false
-                showLoading = false
-                resetUIState()
-            },
-        ) {
+        NoInternetDialog(onDismissRequest = {
+            noInternet = false
+            resetUIState()
+        }) {
             noInternet = false
             resetUIState()
         }
     }
 
     if (showForceLogoutDialog) {
-        BaseDialog(
-            title = "Phiên đăng nhập đã hết hạn",
-            textOk = "Đăng xuất",
+        ForceLogoutDialog(
             onDismissRequest = {
                 showForceLogoutDialog = false
             }
